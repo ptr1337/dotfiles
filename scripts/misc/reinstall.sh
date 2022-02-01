@@ -3,7 +3,7 @@
 wget https://build.cachyos.org/cachyos-repo.tar.xz
 tar xvf cachyos-repo.tar.xz
 sudo ./cachyos-repo.sh
-wget 
+wget https://raw.githubusercontent.com/ptr1337/dotfiles/master/scripts/misc/makepkg.conf
 sudo mv makepkg.conf /etc/makepkg.conf
 
 paru -S --noconfirm nextcloud-client llvm clang lld llvm-libs compiler-rt mesa ungoogled-chromium cachyos discord-canary flameshot krusader-git cachyos-gaming-meta bitwarden keepassxc latte-dock mold-git 64gram-desktop session-desktop-bin cpu-x-git flameshot bleachbit eddie-ui-git hummingbird-bin makepkg-optimize-mold github-desktop-bin atom bleachbit meld smartgit thunderbird zsh xlayoutdisplay chromium-extension-web-store beautysh autopep8 shellcheck xclip vscodium vscodium-marketplace vscodium-features micro zenmonitor3-git zsh 

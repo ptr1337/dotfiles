@@ -15,14 +15,11 @@ install_prefix_root="${HOME:?}/.tools"
 LLVM_BRANCH=main # temporary, can comment out
 llvm_source_dir="${git_dir}/llvm"
 llvm_build_dir="${git_dir}/llvm-build"
-llvm_branch="${LLVM_BRANCH:-release/13.x}"
+llvm_branch="main"
 first_stage_install_prefix="${install_prefix_root:?}/llvm-stage1"
 second_stage_install_prefix="${install_prefix_root:?}/llvm-stage2" # instrumented build
 install_prefix="${install_prefix_root:?}/llvm"
 
-# Include What You Use vars
-iwyu_source_dir="${git_dir:?}/iwyu"
-iwyu_branch="${IWYU_BRANCH:-clang_13}"
 
 error() {
   echo "${*:?}" > /dev/stderr
@@ -173,7 +170,6 @@ update_project() {
     git fetch origin "${branch}"
     git clean -fdx
     git reset --hard origin/"${branch}"
-    git revert --no-edit 2edb89c746848c52964537268bf03e7906bf2542 # temp fix for Clang 14 Lexer regression
   )
 }
 
@@ -183,13 +179,10 @@ install_llvm() {
 
   rm -rf ./*
   if [ ${LLVM_BUILD_STAGE} = 1 ]; then
+    CC=clang CXX=clang++ LD=lld \
     cmake "${llvm_source_dir:?}/llvm" \
       -DCMAKE_BUILD_TYPE=Release \
       -DLLVM_ENABLE_PROJECTS:STRING="clang;lld;compiler-rt;bolt" \
-      -DCMAKE_C_COMPILER=/usr/bin/gcc \
-      -DCMAKE_CXX_COMPILER=/usr/bin/g++ \
-      -DCMAKE_RANLIB=/usr/bin/ranlib \
-      -DCMAKE_AR=/usr/bin/ar \
       -DLLVM_TARGETS_TO_BUILD:STRING=Native \
       -DCMAKE_POLICY_DEFAULT_CMP0069=NEW \
       -DCOMPILER_RT_BUILD_SANITIZERS=OFF \
@@ -205,19 +198,19 @@ install_llvm() {
 	    -DLLVM_ENABLE_WARNINGS=OFF \
       -DLLVM_BUILD_EXAMPLES=OFF \
       -DCMAKE_INSTALL_PREFIX="${first_stage_install_prefix:?}" \
-      -G Ninja
+      -G  Ninja
   fi
 
   if [ ${LLVM_BUILD_STAGE} = 2 ]; then
     cmake "${llvm_source_dir:?}/llvm" \
       -DCMAKE_BUILD_TYPE=Release \
-      -DLLVM_ENABLE_PROJECTS:STRING="clang;clang-tools-extra;compiler-rt;lld;lldb;bolt;polly" \
+      -DLLVM_ENABLE_PROJECTS:STRING="clang;compiler-rt;lld;lldb;bolt;polly" \
       -DCMAKE_C_COMPILER="${first_stage_install_prefix:?}/bin/clang" \
       -DCMAKE_CXX_COMPILER="${first_stage_install_prefix:?}/bin/clang++" \
       -DCMAKE_RANLIB="${first_stage_install_prefix:?}/bin/llvm-ranlib" \
       -DCMAKE_AR="${first_stage_install_prefix:?}/bin/llvm-ar" \
-      -DCMAKE_CXX_FLAGS="-O3 -mtune=native -march=native -m64 -mavx -fomit-frame-pointer" \
-      -DCMAKE_C_FLAGS="-O3 -mtune=native -march=native -m64 -mavx -fomit-frame-pointer" \
+      -DCMAKE_CXX_FLAGS="-O3 -march=native -lgomp -mllvm -polly -mllvm -polly-num-threads=$(getconf _NPROCESSORS_ONLN) -mllvm -polly-parallel -Xclang -load -Xclang LLVMPolly.so" \
+      -DCMAKE_C_FLAGS="-O3 -march=native -lgomp -mllvm -polly -mllvm -polly-num-threads=$(getconf _NPROCESSORS_ONLN) -mllvm -polly-parallel -Xclang -load -Xclang LLVMPolly.so" \
       -DCMAKE_EXE_LINKER_FLAGS="-Wl,--as-needed -Wl,--build-id=sha1 -Wl,--emit-relocs" \
       -DCMAKE_MODULE_LINKER_FLAGS="-Wl,--as-needed -Wl,--build-id=sha1 -Wl,--emit-relocs" \
       -DCMAKE_SHARED_LINKER_FLAGS="-Wl,--as-needed -Wl,--build-id=sha1 -Wl,--emit-relocs" \
@@ -229,6 +222,8 @@ install_llvm() {
       -DLLVM_ENABLE_RTTI=ON \
       -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON \
       -DCMAKE_POLICY_DEFAULT_CMP0069=NEW \
+	    -DLLVM_ENABLE_LLD=ON \
+    	-DLLVM_ENABLE_LTO=Thin \
       -DLLVM_INCLUDE_TESTS=OFF \
 	    -DLLVM_ENABLE_OCAMLDOC=OFF \
 	    -DLLVM_INCLUDE_DOCS=OFF \
@@ -242,7 +237,7 @@ install_llvm() {
       -C "${llvm_source_dir}/clang/cmake/caches/PGO.cmake" \
       -G Ninja
 
-    ninja -j${jobs} stage2
+sudo    ninja -j${jobs} stage2
   fi
 
   ninja -j${jobs} install && rm -rf "${llvm_build_dir:?}"
