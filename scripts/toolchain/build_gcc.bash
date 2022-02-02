@@ -174,7 +174,7 @@ install_gcc() {
   else
     check_gcc_executable "${install_prefix:?}/bin/gcc"
     check_gcc_executable "${install_prefix:?}/bin/g++"
-    
+
     rm -rf "${first_stage_install_prefix:?}"
   fi
 }
