@@ -3,7 +3,7 @@
 set -euo pipefail
 
 # Vars set by getopts
-self_pgo=true
+self_pgo=false
 manual_pgo_build_script_path=""
 
 # General vars
@@ -119,7 +119,7 @@ check_requirements() {
   fi
 
   # CachyOS dependencies
-  if [ "$(echo "${distro}" | grep -i arcgkubzx)" != "" ]; then
+  if [ "$(echo "${distro}" | grep -i archlinux)" != "" ]; then
     install_cachyos_dep
   fi
 
@@ -198,10 +198,6 @@ install_llvm() {
       -DCOMPILER_RT_BUILD_XRAY=OFF \
       -DCOMPILER_RT_BUILD_LIBFUZZER=OFF \
       -DLLVM_ENABLE_RTTI=ON \
-      -DLLVM_INCLUDE_TESTS=OFF \
-      -DLLVM_INCLUDE_EXAMPLES=OFF \
-      -DLLVM_BUILD_TESTS=OFF \
-      -DLLVM_ENABLE_OCAMLDOC=OFF \
       -DLLVM_INCLUDE_DOCS=OFF \
       -DLLVM_ENABLE_BACKTRACES=OFF \
       -DLLVM_ENABLE_WARNINGS=OFF \
@@ -218,8 +214,8 @@ install_llvm() {
       -DCMAKE_CXX_COMPILER="${first_stage_install_prefix:?}/bin/clang++" \
       -DCMAKE_RANLIB="${first_stage_install_prefix:?}/bin/llvm-ranlib" \
       -DCMAKE_AR="${first_stage_install_prefix:?}/bin/llvm-ar" \
-      -DCMAKE_CXX_FLAGS="-O3 -mtune=native -march=native -m64 -mavx -fomit-frame-pointer" \
-      -DCMAKE_C_FLAGS="-O3 -mtune=native -march=native -m64 -mavx -fomit-frame-pointer" \
+      -DCMAKE_CXX_FLAGS="-O3 -march=native -m64 -mavx -fomit-frame-pointer" \
+      -DCMAKE_C_FLAGS="-O3-march=native -m64 -mavx -fomit-frame-pointer" \
       -DCMAKE_EXE_LINKER_FLAGS="-Wl,--as-needed -Wl,--build-id=sha1 -Wl,--emit-relocs" \
       -DCMAKE_MODULE_LINKER_FLAGS="-Wl,--as-needed -Wl,--build-id=sha1 -Wl,--emit-relocs" \
       -DCMAKE_SHARED_LINKER_FLAGS="-Wl,--as-needed -Wl,--build-id=sha1 -Wl,--emit-relocs" \
@@ -231,10 +227,6 @@ install_llvm() {
       -DLLVM_ENABLE_RTTI=ON \
       -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON \
       -DCMAKE_POLICY_DEFAULT_CMP0069=NEW \
-      -DLLVM_INCLUDE_TESTS=OFF \
-      -DLLVM_ENABLE_OCAMLDOC=OFF \
-      -DLLVM_INCLUDE_DOCS=OFF \
-      -DLLVM_ENABLE_BACKTRACES=OFF \
       -DLLVM_ENABLE_WARNINGS=OFF \
       -DLLVM_INCLUDE_EXAMPLES=OFF \
       -DLLVM_BUILD_TESTS=OFF \
