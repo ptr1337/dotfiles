@@ -4,6 +4,7 @@ af_alg
 algif_hash
 algif_skcipher
 asn1_encoder
+asus_wmi
 blake2s_x86_64
 bluetooth
 bnep
@@ -33,6 +34,7 @@ dm_crypt
 dm_mod
 ecdh_generic
 edac_mce_amd
+eeepc_wmi
 encrypted_keys
 exfat
 fat
@@ -45,6 +47,7 @@ gpio_generic
 hid_logitech_dj
 hid_logitech_hidpp
 hidp
+hid_playstation
 hid_sony
 i2c_piix4
 inet_diag
@@ -62,6 +65,8 @@ iwlwifi
 joydev
 k10temp
 kvm
+kvm_amd
+led_class_multicolor
 ledtrig_audio
 libarc4
 libblake2s
@@ -91,10 +96,14 @@ nft_counter
 nft_ct
 nft_reject
 nft_reject_ipv6
+nvme
+nvme_core
 overlay
 pcspkr
 pinctrl_amd
+platform_profile
 poly1305_x86_64
+qrtr
 r8169
 rapl
 realtek
@@ -123,6 +132,7 @@ snd_usb_audio
 snd_usbmidi_lib
 soundcore
 sp5100_tco
+sparse_keymap
 stp
 tcp_diag
 tee
@@ -144,6 +154,7 @@ usbmouse
 usb_storage
 veth
 vfat
+video
 wireguard
 wmi
 wmi_bmof
@@ -154,5 +165,6 @@ x_tables
 xt_addrtype
 xt_conntrack
 xt_MASQUERADE
+xt_tcpudp
 zenpower
 zram
