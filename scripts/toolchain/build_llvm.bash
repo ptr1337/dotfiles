@@ -7,7 +7,7 @@ self_pgo=false
 manual_pgo_build_script_path=""
 
 # General vars
-jobs="$(echo $(( $(nproc) * 3/4 )) | cut -d '.' -f1)"
+jobs="$(echo $(( $(nproc) * 4/4 )) | cut -d '.' -f1)"
 git_dir="${HOME:?}/git"
 install_prefix_root="${HOME:?}/.tools"
 
@@ -18,6 +18,7 @@ llvm_build_dir="${git_dir}/llvm-build"
 llvm_branch="${LLVM_BRANCH:-release/14.x}"
 first_stage_install_prefix="${install_prefix_root:?}/llvm-stage1"
 second_stage_install_prefix="${install_prefix_root:?}/llvm-stage2" # instrumented build
+bolt_stage_install_prefix="${install_prefix_root:?}/llvm-stage2-bolt" # bolt llvm with and without branch sampling
 install_prefix="${install_prefix_root:?}/llvm"
 
 
@@ -215,7 +216,7 @@ install_llvm() {
       -DCMAKE_RANLIB="${first_stage_install_prefix:?}/bin/llvm-ranlib" \
       -DCMAKE_AR="${first_stage_install_prefix:?}/bin/llvm-ar" \
       -DCMAKE_CXX_FLAGS="-O3 -march=native -m64 -mavx -fomit-frame-pointer" \
-      -DCMAKE_C_FLAGS="-O3-march=native -m64 -mavx -fomit-frame-pointer" \
+      -DCMAKE_C_FLAGS="-O3 -march=native -m64 -mavx -fomit-frame-pointer" \
       -DCMAKE_EXE_LINKER_FLAGS="-Wl,--as-needed -Wl,--build-id=sha1 -Wl,--emit-relocs" \
       -DCMAKE_MODULE_LINKER_FLAGS="-Wl,--as-needed -Wl,--build-id=sha1 -Wl,--emit-relocs" \
       -DCMAKE_SHARED_LINKER_FLAGS="-Wl,--as-needed -Wl,--build-id=sha1 -Wl,--emit-relocs" \
@@ -225,6 +226,7 @@ install_llvm() {
       -DLLVM_ENABLE_LLD=ON \
       -DLLVM_ENABLE_PIC=ON \
       -DLLVM_ENABLE_RTTI=ON \
+      -DLLVM_BINUTILS_INCDIR=/usr/include \
       -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON \
       -DCMAKE_POLICY_DEFAULT_CMP0069=NEW \
       -DLLVM_ENABLE_WARNINGS=OFF \
@@ -240,6 +242,116 @@ install_llvm() {
   fi
 
   ninja -j${jobs} install && rm -rf "${llvm_build_dir:?}"
+
+
+  if [ ${LLVM_BUILD_STAGE} = 3 ]; then
+
+    perf record -e cycles:u -j any,u -- sleep 1 &>/dev/null;
+    if [[ $? == "0" ]]; then
+      echo "BOLTING with Profile!"
+      ./build_stage3-bolt.bash || (echo "Optimizing Stage2-Toolchain further with llvm-bolt failed!"; exit 1)
+
+      cmake "${llvm_source_dir:?}/llvm" \
+        -DLLVM_BINUTILS_INCDIR=/usr/include \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_C_COMPILER="${install_prefix:?}/bin/clang" \
+        -DCMAKE_CXX_COMPILER="${install_prefix:?}/bin/clang++" \
+        -DCMAKE_RANLIB="${install_prefix:?}/bin/llvm-ranlib" \
+        -DCMAKE_AR="${install_prefix:?}/bin/llvm-ar" \
+        -DLLVM_ENABLE_PROJECTS="clang" \
+        -DCMAKE_CXX_FLAGS="-O3 -march=native -m64 -mavx -fomit-frame-pointer" \
+        -DCMAKE_C_FLAGS="-O3 -march=native -m64 -mavx -fomit-frame-pointer" \
+        -DLLVM_TARGETS_TO_BUILD:STRING=Native \
+        -DCMAKE_POLICY_DEFAULT_CMP0069=NEW \
+        -DCOMPILER_RT_BUILD_SANITIZERS=OFF \
+        -DCOMPILER_RT_BUILD_XRAY=OFF \
+        -DCOMPILER_RT_BUILD_LIBFUZZER=OFF \
+        -DLLVM_ENABLE_RTTI=ON \
+        -DLLVM_INCLUDE_DOCS=OFF \
+        -DLLVM_ENABLE_BACKTRACES=OFF \
+        -DLLVM_ENABLE_WARNINGS=OFF \
+        -DLLVM_BUILD_EXAMPLES=OFF \
+        -DCMAKE_INSTALL_PREFIX="${bolt_stage_install_prefix:?}" \
+        -G ninja
+
+      perf record -o ${TOPLEV}/perf.data --max-size=10G -F 1500 -e cycles:u -j any,u -- ninja clang
+
+      ${first_stage_install_prefix:?}/perf2bolt ${CPATH}/clang-15 \
+        -p ${install_prefix_root:?}/perf.data \
+        -o ${install_prefix_root:?}/clang-15.fdata || (echo "Could not convert perf-data to bolt for clang-15"; exit 1)
+
+      echo "Optimizing Clang with the generated profile"
+
+      ${first_stage_install_prefix:?}/llvm-bolt ${install_prefix:?}/clang-15 \
+        -o ${install_prefix:?}/clang-15.bolt \
+        --data ${install_prefix_root:?}/clang-15.fdata \
+        -reorder-blocks=cache+ \
+        -reorder-functions=hfsort+ \
+        -split-functions=3 \
+        -split-all-cold \
+        -dyno-stats \
+        -icf=1 \
+        -use-gnu-stack
+    else
+
+      echo "Optimizing Stage2-Toolchain with instrumenting"
+      echo "Instrument clang with llvm-bolt"
+
+      mkdir ${bolt_stage_install_prefix:?}/intrumentdata
+
+      ${first_stage_install_prefix:?}/llvm-bolt \
+        --instrument \
+        --instrumentation-file-append-pid \
+        --instrumentation-file=${bolt_stage_install_prefix:?}/intrumentdata/clang-15.fdata \
+        ${install_prefix:?}/clang-15 \
+        -o ${install_prefix:?}/clang-15.inst
+
+      mv ${install_prefix:?}/clang-15 ${install_prefix:?}/clang-15.org
+      mv ${install_prefix:?}/clang-15.inst ${install_prefix:?}/clang-15
+
+      cmake "${llvm_source_dir:?}/llvm" \
+        -DLLVM_BINUTILS_INCDIR=/usr/include \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_C_COMPILER="${install_prefix:?}/bin/clang" \
+        -DCMAKE_CXX_COMPILER="${install_prefix:?}/bin/clang++" \
+        -DCMAKE_RANLIB="${install_prefix:?}/bin/llvm-ranlib" \
+        -DCMAKE_AR="${install_prefix:?}/bin/llvm-ar" \
+        -DLLVM_ENABLE_PROJECTS="clang" \
+        -DCMAKE_CXX_FLAGS="-O3 -march=native -m64 -mavx -fomit-frame-pointer" \
+        -DCMAKE_C_FLAGS="-O3 -march=native -m64 -mavx -fomit-frame-pointer" \
+        -DLLVM_TARGETS_TO_BUILD:STRING=Native \
+        -DCMAKE_POLICY_DEFAULT_CMP0069=NEW \
+        -DCOMPILER_RT_BUILD_SANITIZERS=OFF \
+        -DCOMPILER_RT_BUILD_XRAY=OFF \
+        -DCOMPILER_RT_BUILD_LIBFUZZER=OFF \
+        -DLLVM_ENABLE_RTTI=ON \
+        -DLLVM_INCLUDE_DOCS=OFF \
+        -DLLVM_ENABLE_BACKTRACES=OFF \
+        -DLLVM_ENABLE_WARNINGS=OFF \
+        -DLLVM_BUILD_EXAMPLES=OFF \
+        -DCMAKE_INSTALL_PREFIX="${bolt_stage_install_prefix:?}" \
+        -G ninja
+
+      echo "== Start Training Build"
+      ninja & read -t 180 || kill $!
+
+      echo "Merging generated profiles"
+      cd ${TOPLEV}/build/llvm/stage3-without-sampling/intrumentdata
+      ${first_stage_install_prefix:?}/merge-fdata ${bolt_stage_install_prefix:?}/intrumentdata/*.fdata > ${install_prefix_root:?}/combined.fdata
+      echo "Optimizing Clang with the generated profile"
+
+      ${TOPLEV}/build/llvm/stage1/bin/llvm-bolt ${CPATH}/clang-15.org \
+        --data ${install_prefix_root:?}/combined.fdata \
+        -o ${install_prefix:?}/clang-15 \
+        -reorder-blocks=cache+ \
+        -reorder-functions=hfsort+ \
+        -split-functions=3 \
+        -split-all-cold \
+        -dyno-stats \
+        -icf=1 \
+        -use-gnu-stack || (echo "Could not optimize binary for clang-15"; exit 1)
+    fi
+  fi
 
   if [ -n "${LLVM_BUILD_STAGE}" ]; then
     check_llvm_executable "${first_stage_install_prefix:?}/bin/clang"
@@ -263,6 +375,7 @@ main() {
   check_requirements
   update_project "${llvm_source_dir:?}" "${llvm_branch:?}"
   LLVM_BUILD_STAGE=1  build_llvm "$@"
+  LLVM_BUILD_STAGE=2 build_llvm "$@"
   LLVM_BUILD_STAGE=2 build_llvm "$@"
 
   echo

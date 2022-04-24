@@ -13,7 +13,7 @@ source_dir="${git_dir:?}/gcc"
 build_dir="${git_dir:?}/gcc-build"
 first_stage_install_prefix="${install_prefix_root:?}/gcc-stage1"
 install_prefix="${install_prefix_root:?}/gcc"
-release_branch="releases/gcc-11"
+release_branch="master"
 target_arch="native"
 
 error() {
@@ -115,10 +115,10 @@ install_gcc() {
       --enable-threads=posix \
       --enable-__cxa_atexit \
       --enable-clocale=gnu \
-      --enable-languages=c,c++ \
+      --enable-languages=c,c++,lto \
       --enable-lto \
       --enable-plugin \
-      --enable-ld=default \
+      --with-ld=/usr/bin/mold \
       --enable-linker-build-id \
       --with-system-zlib \
       --with-gnu-ld \
@@ -127,7 +127,7 @@ install_gcc() {
       --disable-werror \
       --with-arch=${target_arch} \
       --with-tune=${target_arch} \
-      --with-glibc-version=2.33
+      --with-glibc-version=2.35
 
     make -j${jobs:?}
   else
@@ -140,19 +140,21 @@ install_gcc() {
       --enable-threads=posix \
       --enable-__cxa_atexit \
       --enable-clocale=gnu \
-      --enable-languages=c,c++ \
+      --enable-languages=c,c++,lto \
       --enable-lto \
       --enable-plugin \
       --enable-ld=default \
       --enable-linker-build-id \
       --with-system-zlib \
+      --with-ld=/usr/bin/mold \
       --with-gnu-ld \
       --with-ppl=yes \
+      --with-linker-hash-style=gnu \
       --disable-multilib \
       --disable-werror \
       --with-arch=${target_arch} \
       --with-tune=${target_arch} \
-      --with-glibc-version=2.33
+      --with-glibc-version=2.35
 
     make -j${jobs:?} \
       CFLAGS_FOR_BUILD="${cflags}" \

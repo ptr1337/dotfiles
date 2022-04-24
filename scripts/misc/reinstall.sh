@@ -15,7 +15,7 @@ paru -S --noconfirm nextcloud-client llvm clang lld llvm-libs compiler-rt mesa u
 mkdir projects
 mkdir projects/cachyos
 mkdir projects/kernel
-mkdir repo 
+mkdir repo
 git clone https://github.com/ptr1337/dotfiles.git .dotfiles
 cd repo
 git clone https://github.com/ptr1337/arch-packages.git
@@ -33,5 +33,5 @@ xlayoutdisplay -p DP-2 -o DP-2 -o DP-4
 #VSyncMechanism=OML
 
 
-#nvidia 
+#nvidia
 #     Option         "Coolbits" "24"
