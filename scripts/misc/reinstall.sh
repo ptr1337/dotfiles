@@ -1,7 +1,8 @@
 #!/bin/bash
 
-paru -S --noconfirm llvm clang lld llvm-libs compiler-rt mesa ungoogled-chromium cachyos discord-canary flameshot krusader-git cachyos-gaming-meta bitwarden keepassxc latte-dock mold-git 64gram-desktop-bin cpu-x-git flameshot bleachbit eddie-ui-git makepkg-optimize-mold github-desktop-bin atom bleachbit meld smartgit thunderbird zsh xlayoutdisplay chromium-extension-web-store beautysh autopep8 shellcheck xclip vscodium-bin micro zenmonitor3-git zsh aria2-fast element-desktop buildcache-git
+AUR=/home/ptr1337/projects/kernel/aur
 
+paru -S --noconfirm llvm clang lld llvm-libs compiler-rt mesa cachyos discord-canary flameshot krusader-git cachyos-gaming-meta bitwarden cpu-x-git flameshot bleachbit eddie-ui-git makepkg-optimize-mold atom bleachbit meld smartgit thunderbird zsh xlayoutdisplay beautysh autopep8 shellcheck xclip vscodium-bin micro zenmonitor3-git zsh aria2-fast
 mkdir projects
 mkdir projects/cachyos
 mkdir projects/kernel
@@ -13,16 +14,34 @@ git clone git@github.com:CachyOS/linux-cachyos.git
 cd ..
 cd projects/cachyos
 git clone git@github.com:CachyOS/calamares-config.git
-git@github.com:CachyOS/CachyOS-Live-ISO.git
-git@github.com:CachyOS/CachyOS-PKGBUILDS.git
-git@github.com:CachyOS/CachyOS-Browser-Common.git
-git@github.com:CachyOS/CachyOS-Settings.git
+git clone git@github.com:CachyOS/CachyOS-Live-ISO.git
+git clone git@github.com:CachyOS/CachyOS-PKGBUILDS.git
+git clone git@github.com:CachyOS/CachyOS-Browser-Common.git
+git clone git@github.com:CachyOS/CachyOS-Settings.git
+git clone https://github.com/ptr1337/llvm-bolt-scripts.git
 cd ..
 cd kernel
 git clone git@github.com:CachyOS/linux.git
 git clone git@github.com:CachyOS/linux-cachyos.git
 git clone git@github.com:ptr1337/kernel-patches.git
 git clone git@github.com:ptr1337/linux-cacule.git
+
+
+mkdir -p ${AUR}
+cd ${AUR}
+git clone ssh://aur@aur.archlinux.org/linux-cachyos.git
+git clone ssh://aur@aur.archlinux.org/linux-cachyos-tt.git
+git clone ssh://aur@aur.archlinux.org/linux-cachyos-cfs.git
+git clone ssh://aur@aur.archlinux.org/linux-cachyos-bore.git
+git clone ssh://aur@aur.archlinux.org/linux-cachyos-bmq.git
+git clone ssh://aur@aur.archlinux.org/linux-cachyos-pds.git
+git clone ssh://aur@aur.archlinux.org/linux-cachyos-cacule.git
+git clone ssh://aur@aur.archlinux.org/linux-cachyos-hardened.git
+git clone ssh://aur@aur.archlinux.org/linux-cacule.git
+git clone ssh://aur@aur.archlinux.org/linux-cacule-rdb.git
+git clone ssh://aur@aur.archlinux.org/linux-bore.git
+git clone ssh://aur@aur.archlinux.org/linux-tt.git
+
 
 xlayoutdisplay -p DP-2 -o DP-2 -o DP-4
 
