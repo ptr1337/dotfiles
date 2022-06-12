@@ -2,7 +2,7 @@
 
 AUR=/home/ptr1337/projects/kernel/aur
 
-paru -S --noconfirm llvm clang lld llvm-libs compiler-rt mesa cachyos discord-canary flameshot krusader-git cachyos-gaming-meta bitwarden cpu-x-git flameshot bleachbit eddie-ui-git makepkg-optimize-mold atom bleachbit meld smartgit thunderbird zsh xlayoutdisplay beautysh autopep8 shellcheck xclip vscodium-bin micro zenmonitor3-git zsh aria2-fast
+paru -S llvm clang lld llvm-libs compiler-rt mesa cachyos discord-canary flameshot krusader-git cachyos-gaming-meta bitwarden cpu-x-git flameshot bleachbit eddie-ui-git makepkg-optimize-mold atom bleachbit meld smartgit thunderbird zsh xlayoutdisplay beautysh autopep8 shellcheck xclip vscodium-bin micro zenmonitor3-git zsh aria2-fast
 mkdir projects
 mkdir projects/cachyos
 mkdir projects/kernel
