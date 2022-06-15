@@ -2,13 +2,14 @@
 
 AUR=/home/ptr1337/projects/kernel/aur
 
-paru -S llvm clang lld llvm-libs compiler-rt mesa cachyos discord-canary flameshot krusader-git cachyos-gaming-meta bitwarden cpu-x-git flameshot bleachbit eddie-ui-git makepkg-optimize-mold atom bleachbit meld smartgit thunderbird zsh xlayoutdisplay beautysh autopep8 shellcheck xclip vscodium-bin micro zenmonitor3-git zsh aria2-fast
+paru -S llvm clang lld llvm-libs compiler-rt mesa cachyos discord-canary flameshot krusader-git cachyos-gaming-meta bitwarden cpu-x-git flameshot bleachbit eddie-ui-git makepkg-optimize-mold atom bleachbit meld smartgit thunderbird zsh xlayoutdisplay beautysh autopep8 shellcheck xclip vscodium-bin micro zenmonitor3-git zsh aria2-fast aur/kotatogram-desktop kitty
+
+
 mkdir projects
 mkdir projects/cachyos
 mkdir projects/kernel
 mkdir repo
 cd repo
-git clone https://github.com/ptr1337/arch-packages.git
 git clone https://github.com/Frogging-Family/nvidia-all
 git clone git@github.com:CachyOS/linux-cachyos.git
 cd ..
@@ -25,7 +26,8 @@ git clone git@github.com:CachyOS/linux.git
 git clone git@github.com:CachyOS/linux-cachyos.git
 git clone git@github.com:ptr1337/kernel-patches.git
 git clone git@github.com:ptr1337/linux-cacule.git
-
+git clone git@github.com:ptr1337/toolchain.git
+git clone git@github.com:ptr1337/makepkg-optimize.git
 
 mkdir -p ${AUR}
 cd ${AUR}
