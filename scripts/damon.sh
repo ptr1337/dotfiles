@@ -2,6 +2,10 @@
 
 sudo mount -t debugfs none /sys/kernel/debug/
 
+
+## Does not work with sudo
+sudo su
+
 echo 500 > /sys/module/damon_lru_sort/parameters/hot_thres_access_freq
 echo 120000000 > /sys/module/damon_lru_sort/parameters/cold_min_age
 echo 10 > /sys/module/damon_lru_sort/parameters/quota_ms
