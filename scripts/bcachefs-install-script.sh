@@ -37,10 +37,9 @@ install_base () {
     ENDSECTOR=$(sgdisk -E "$DISK")
     sgdisk --new 2:0:"$ENDSECTOR" --typecode 2:8309 --change-name 2:"Root Partition" "$DISK"
 
+    # Format bcachefs partition and mount it
     bcachefs format "${DISK}"2
-
-    mount "${DISK}"2
-    /mnt
+    mount "${DISK}"2 /mnt
 
     # Prepare boot partition: create fat32 filesystem
     mkfs.fat -F32 "${DISK}"1
