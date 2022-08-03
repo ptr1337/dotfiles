@@ -4,8 +4,6 @@ set fish_greeting
 set VIRTUAL_ENV_DISABLE_PROMPT "1"
 set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
 
-export "MICRO_TRUECOLOR=1"
-
 ## Export variable need for qt-theme
 if type "qtile" >> /dev/null 2>&1
    set -x QT_QPA_PLATFORMTHEME "qt5ct"
@@ -98,10 +96,6 @@ alias ll='exa -l --color=always --group-directories-first --icons'  # long forma
 alias lt='exa -aT --color=always --group-directories-first --icons' # tree listing
 alias l.="exa -a | egrep '^\.'"                                     # show only dotfiles
 
-# Replace some more things with better alternatives
-alias cat='bat --style header --style rules --style snip --style changes --style header'
-[ ! -x /usr/bin/yay ] && [ -x /usr/bin/paru ] && alias yay='paru'
-
 # Common use
 alias grubup="sudo update-grub"
 alias fixpacman="sudo rm /var/lib/pacman/db.lck"
@@ -138,6 +132,8 @@ alias apt-get='man pacman'
 alias please='sudo'
 alias tb='nc termbin.com 9999'
 
+alias dockerbuild='time docker run -e EXPORT_PKG=1 -e USE_PARU=1 -e SYNC_DATABASE=1 -e IGNORE_ARCH=1 -v $PWD:/pkg pttrr/docker-makepkg'
+alias dockerbuildv3='time docker run -e EXPORT_PKG=1 -e USE_PARU=1 -e SYNC_DATABASE=1 -e IGNORE_ARCH=1 -v $PWD:/pkg pttrr/docker-makepkg-v3'
 # Cleanup orphaned packages
 alias cleanup='sudo pacman -Rns (pacman -Qtdq)'
 
@@ -147,7 +143,8 @@ alias jctl="journalctl -p 3 -xb"
 # Recent installed packages
 alias rip="expac --timefmt='%Y-%m-%d %T' '%l\t%n %v' | sort | tail -200 | nl"
 
-
+#alias usebolt="export PATH=/.toolchain/llvm/bin:$PATH"
+alias usebolt="export PATH=$HOME/.toolchain/llvm/bin:$PATH"
 ## Run fastfetch if session is interactive
 if status --is-interactive
    fastfetch
