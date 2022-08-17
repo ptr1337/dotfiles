@@ -21,7 +21,7 @@ git clone git@github.com:CachyOS/CachyOS-PKGBUILDS.git
 git clone git@github.com:CachyOS/CachyOS-Browser-Common.git
 git clone git@github.com:CachyOS/CachyOS-Browser-Settings.git
 git clone git@github.com:CachyOS/CachyOS-Settings.git
-git clone git@github.com:ptr1337/lvm-bolt-scripts.git
+git clone git@github.com:ptr1337/llvm-bolt-scripts.git
 git clone git@github.com:ptr1337/makepkg-optimize.git
 cd ..
 cd kernel
