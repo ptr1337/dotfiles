@@ -35,9 +35,6 @@ if test -d ~/Applications/depot_tools
 end
 
 
-## Advanced command-not-found hook
-source /usr/share/doc/find-the-command/ftc.fish
-
 ## Functions
 # Functions needed for !! and !$ https://github.com/oh-my-fish/plugin-bang-bang
 function __history_previous_command
@@ -87,6 +84,8 @@ function copy
         command cp $argv
     end
 end
+
+export "MICRO_TRUECOLOR=1"
 
 ## Useful aliases
 # Replace ls with exa
@@ -145,6 +144,9 @@ alias rip="expac --timefmt='%Y-%m-%d %T' '%l\t%n %v' | sort | tail -200 | nl"
 
 #alias usebolt="export PATH=/.toolchain/llvm/bin:$PATH"
 alias usebolt="export PATH=$HOME/.toolchain/llvm/bin:$PATH"
+
+alias weather="curl -H 'Accept-Language: de' wttr.in/Dasing"
+
 ## Run fastfetch if session is interactive
 if status --is-interactive
    fastfetch
