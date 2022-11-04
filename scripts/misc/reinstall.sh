@@ -2,7 +2,7 @@
 
 AUR=/home/ptr1337/projects/kernel/aur
 
-paru -S llvm clang lld llvm-libs compiler-rt mesa-tkg-git lib32-mesa-tkg-git cachyos discord-canary flameshot krusader-git cachyos-gaming-meta bitwarden cpu-x-git flameshot bleachbit eddie-ui-git makepkg-optimize-mold atom bleachbit meld smartgit thunderbird zsh xlayoutdisplay beautysh autopep8 shellcheck xclip vscodium-bin micro zenmonitor3-git zsh aria2-fast forkgram kitty atom betterdiscordctl
+paru -S llvm clang lld llvm-libs compiler-rt  bitwarden cpu-x-git flameshot bleachbit eddie-ui-git makepkg-optimize-mold atom bleachbit meld smartgit thunderbird zsh xlayoutdisplay beautysh autopep8 shellcheck xclip vscodium-bin micro zenmonitor3-git zsh forkgram
 
 echo  "Create directorys"
 mkdir projects
