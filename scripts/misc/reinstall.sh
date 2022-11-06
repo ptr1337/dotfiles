@@ -1,19 +1,20 @@
 #!/bin/bash
 
 AUR=/home/ptr1337/projects/kernel/aur
-
-paru -S llvm clang lld llvm-libs compiler-rt  bitwarden cpu-x-git flameshot bleachbit eddie-ui-git makepkg-optimize-mold atom bleachbit meld smartgit thunderbird zsh xlayoutdisplay beautysh autopep8 shellcheck xclip vscodium-bin micro zenmonitor3-git zsh forkgram
+PROJECTS=/home/ptr1337/projects
+REPO=/home/ptr137/repo
+paru -S llvm clang lld llvm-libs compiler-rt bitwarden cpu-x-git flameshot bleachbit eddie-ui-git makepkg-optimize-mold atom bleachbit meld smartgit thunderbird zsh xlayoutdisplay beautysh autopep8 shellcheck xclip vscodium-bin micro zenmonitor3-git zsh forkgram
 
 echo  "Create directorys"
-mkdir projects
-mkdir projects/cachyos
-mkdir projects/kernel
-mkdir repo
-cd repo
+mkdir -p $PROJECTS
+mkdir -p $AUR
+mkdir $PROJECTS/kernel
+mkdir $PROJECTS/cachyos
+cd $REPO
 git clone git@github.com:CachyOS/linux-cachyos.git
 git clone git@github.com:ptr1337/toolchain.git
-cd ..
-cd projects/cachyos
+cd $HOME
+cd $PROJECTS/cachyos
 echo  "Clone projects stuff"
 git clone git@github.com:CachyOS/calamares-config.git
 git clone git@github.com:CachyOS/CachyOS-Live-ISO.git
@@ -21,10 +22,13 @@ git clone git@github.com:CachyOS/CachyOS-PKGBUILDS.git
 git clone git@github.com:CachyOS/CachyOS-Browser-Common.git
 git clone git@github.com:CachyOS/CachyOS-Browser-Settings.git
 git clone git@github.com:CachyOS/CachyOS-Settings.git
+git clone git@github.com:CachyOS/cachyos-calamares.git
+git clone git@github.com:CachyOS/New-Cli-Installer.git
+git clone git@github.com:CachyOS/ananicy-rules.git
+git clone git@github.com:CachyOS/zfs.git
 git clone git@github.com:ptr1337/llvm-bolt-scripts.git
 git clone git@github.com:ptr1337/makepkg-optimize.git
-cd ..
-cd kernel
+cd $PROJECTS/kernel
 echo  "Clone kernel stuff"
 git clone git@github.com:CachyOS/linux.git
 git clone git@github.com:CachyOS/linux-cachyos.git
