@@ -2,8 +2,8 @@
 
 AUR=/home/ptr1337/projects/kernel/aur
 PROJECTS=/home/ptr1337/projects
-REPO=/home/ptr137/repo
-paru -S llvm clang lld llvm-libs compiler-rt bitwarden cpu-x-git flameshot bleachbit eddie-ui-git makepkg-optimize-mold atom bleachbit meld smartgit thunderbird zsh xlayoutdisplay beautysh autopep8 shellcheck xclip vscodium-bin micro zenmonitor3-git zsh forkgram
+REPO=/home/ptr1337/repo
+paru -S llvm clang lld llvm-libs compiler-rt bitwarden cpu-x-git bleachbit makepkg-optimize-mold meld smartgit thunderbird zsh xlayoutdisplay beautysh autopep8 shellcheck micro zenmonitor3-git zsh
 
 echo  "Create directorys"
 mkdir -p $PROJECTS
@@ -15,8 +15,7 @@ git clone git@github.com:CachyOS/linux-cachyos.git
 git clone git@github.com:ptr1337/toolchain.git
 cd $HOME
 cd $PROJECTS/cachyos
-echo  "Clone projects stuff"
-git clone git@github.com:CachyOS/calamares-config.git
+echo  "Clone CachyOS stuff"
 git clone git@github.com:CachyOS/CachyOS-Live-ISO.git
 git clone git@github.com:CachyOS/CachyOS-PKGBUILDS.git
 git clone git@github.com:CachyOS/CachyOS-Browser-Common.git
@@ -26,15 +25,17 @@ git clone git@github.com:CachyOS/cachyos-calamares.git
 git clone git@github.com:CachyOS/New-Cli-Installer.git
 git clone git@github.com:CachyOS/ananicy-rules.git
 git clone git@github.com:CachyOS/zfs.git
-git clone git@github.com:ptr1337/llvm-bolt-scripts.git
-git clone git@github.com:ptr1337/makepkg-optimize.git
+git clone git@github.com:CachyOS/website.git
+git clone git@github.com:CachyOS/cachyos-fish-config.git
+git clone git@github.com:CachyOS/cachyos-zsh-config.git
+git clone git@github.com:CachyOS/cachyos-kde-settings.git
+
 cd $PROJECTS/kernel
 echo  "Clone kernel stuff"
 git clone git@github.com:CachyOS/linux.git
 git clone git@github.com:CachyOS/linux-cachyos.git
 git clone git@github.com:CachyOS/kernel-patches.git
-git clone git@github.com:ptr1337/linux-cacule.git
-git clone git@github.com:sirlucjan/kernel-patches.git lujan
+git clone git@github.com:sirlucjan/kernel-patches.git lucjan
 
 echo  "Clone aur stuff"
 mkdir -p ${AUR}/kernel
@@ -49,13 +50,14 @@ git clone ssh://aur@aur.archlinux.org/linux-cachyos-cacule.git
 git clone ssh://aur@aur.archlinux.org/linux-cachyos-hardened.git
 git clone ssh://aur@aur.archlinux.org/linux-cacule.git
 git clone ssh://aur@aur.archlinux.org/linux-cacule-rdb.git
-git clone ssh://aur@aur.archlinux.org/linux-bore.git
 git clone ssh://aur@aur.archlinux.org/linux-tt.git
 cd ${AUR}
 git clone ssh://aur@aur.archlinux.org/lapce-git.git
 git clone ssh://aur@aur.archlinux.org/mold-git.git
 git clone ssh://aur@aur.archlinux.org/makepkg-optimize-mold.git
 git clone ssh://aur@aur.archlinux.org/gcc-git.git
+git clone ssh://aur@aur.archlinux.org/contour.git
+git clone ssh://aur@aur.archlinux.org/ananicy-rules.git
 
 echo  "Apply resolution"
 xlayoutdisplay -p DP-2 -o DP-2 -o DP-4

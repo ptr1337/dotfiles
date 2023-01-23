@@ -13,6 +13,19 @@ end
 set -U __done_min_cmd_duration 10000
 set -U __done_notification_urgency_level low
 
+## Enable Wayland support for different applications
+if [ "$XDG_SESSION_TYPE" = "wayland" ]
+    set -gx WAYLAND 1
+    set -gx QT_QPA_PLATFORM 'wayland;xcb'
+    set -gx GDK_BACKEND wayland
+    set -gx MOZ_DBUS_REMOTE 1
+    set -gx MOZ_ENABLE_WAYLAND 1
+    set -gx _JAVA_AWT_WM_NONREPARENTING 1
+    set -gx BEMENU_BACKEND wayland
+    set -gx CLUTTER_BACKEND wayland
+    set -gx ECORE_EVAS_ENGINE wayland_egl
+    set -gx ELM_ENGINE wayland_egl
+end
 
 ## Environment setup
 # Apply .profile: use this to put fish compatible .profile stuff in
@@ -95,8 +108,11 @@ alias ll='exa -l --color=always --group-directories-first --icons'  # long forma
 alias lt='exa -aT --color=always --group-directories-first --icons' # tree listing
 alias l.="exa -a | egrep '^\.'"                                     # show only dotfiles
 
+# Replace some more things with better alternatives
+[ ! -x /usr/bin/yay ] && [ -x /usr/bin/paru ] && alias yay='paru'
+
 # Common use
-alias grubup="sudo update-grub"
+alias grubup="sudo grub-mkconfig -o /boot/grub/grub.cfg"
 alias fixpacman="sudo rm /var/lib/pacman/db.lck"
 alias tarnow='tar -acf '
 alias untar='tar -zxvf '
@@ -142,7 +158,6 @@ alias jctl="journalctl -p 3 -xb"
 # Recent installed packages
 alias rip="expac --timefmt='%Y-%m-%d %T' '%l\t%n %v' | sort | tail -200 | nl"
 
-#alias usebolt="export PATH=/.toolchain/llvm/bin:$PATH"
 alias usebolt="export PATH=$HOME/.toolchain/llvm/bin:$PATH"
 
 alias weather="curl -H 'Accept-Language: de' wttr.in/Dasing"
